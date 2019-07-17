@@ -14,7 +14,7 @@
 	<name>Core</name>
 
 	<modules>
-		<!--<module>gmlc-common-library</module> -->
+		<module>gmlc-common-library</module>
 		<module>domain</module>
 		<module>slee</module>
 		<module>bootstrap</module>

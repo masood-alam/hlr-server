@@ -275,7 +275,7 @@ https://repo1.maven.org/maven2/org/jolokia/jolokia-war/1.1.1/jolokia-war-1.1.1.w
 <!--
 depends="clean,get-jboss,unzip-jboss,get-jolokia-war,get-restcomm-slee,unzip-restcomm-slee,build-core,build-core-tools,get-restcomm-jss7,unzip-restcomm-jss7,build-restcomm-jss7,copy-ss7-beans,get-http,unzip-http,build-http,get-ss7,unzip-ss7,build-ss7,get-hlr-server,unzip-hlr-server,build-hlr-server"
 -->
-	<target name="release" >
+	<target name="release" depends="clean,get-jboss,unzip-jboss,get-jolokia-war,get-restcomm-slee,unzip-restcomm-slee,build-core,build-core-tools,get-restcomm-jss7,unzip-restcomm-jss7,build-restcomm-jss7,copy-ss7-beans,get-http,unzip-http,build-http,get-ss7,unzip-ss7,build-ss7,get-hlr-server,unzip-hlr-server,build-hlr-server" >
 
 		<!-- copy log4j presets -->
 		<copy file="${jboss.home}/server/default/deploy/restcomm-slee/log4j-templates/jboss-log4j.xml.default" tofile="${jboss.home}/server/default/conf/jboss-log4j.xml" overwrite="true" />
@@ -298,6 +298,7 @@ depends="clean,get-jboss,unzip-jboss,get-jolokia-war,get-restcomm-slee,unzip-res
 
 	<target name="clean">
 		<delete dir="${output.dir}" />
+		<delete dir="${checkout.dir}" />
 	</target>
 
 	<available file="${ant.file.restcomm.release}/../${jboss.distro.zip.path}" property="got.jboss" /> 
@@ -324,9 +325,9 @@ depends="clean,get-jboss,unzip-jboss,get-jolokia-war,get-restcomm-slee,unzip-res
 
 	<target name="zip-jboss" description="">
 		<fixcrlf srcdir="${jboss.home}/bin" includes="*.sh" eol="lf" eof="remove" />
-		<zip destfile="${ant.file.restcomm.release}/../${zip.filename}" filesonly="false">
-			<zipfileset dir="${release.dir}" prefix="${release.profile}-slee-${release.version}" filemode="755" includes="**/*.sh" />
-			<zipfileset dir="${release.dir}" prefix="${release.profile}-slee-${release.version}" excludes="**/*.sh **/server/*/data/** **/server/*/log/** **/server/*/tmp/** **/server/*/work/** **/server/tmp/**" />
+		<zip destfile="${ant.file.restcomm.release}/../jboss-${jboss.version}-nw.zip" filesonly="false">
+			<zipfileset dir="${release.dir}" filemode="755" includes="**/*.sh" />
+			<zipfileset dir="${release.dir}" excludes="**/*.sh **/server/*/data/** **/server/*/log/** **/server/*/tmp/** **/server/*/work/** **/server/tmp/**" />
 		</zip>
 		<!-- SF has checksum info, no need for this atm 
 		<antcall target="checksum">
@@ -335,6 +336,7 @@ depends="clean,get-jboss,unzip-jboss,get-jolokia-war,get-restcomm-slee,unzip-res
 		</antcall>
 		-->
 	</target>
+
 
 
 

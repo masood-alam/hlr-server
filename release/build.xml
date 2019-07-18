@@ -11,7 +11,7 @@
 
 	<property name="jboss.version" value="5.1.0.GA" />
 	<property name="release.version" value="1.0.0" />
-	<property name="jboss.distro.zip.path" value="jboss-${jboss.version}.zip" />
+	<property name="jboss.distro.zip" value="jboss-${jboss.version}.zip" />
 	<property name="jboss.home.relative.path" value="jboss-${jboss.version}/" />
 	<property name="jboss.home" value="${release.dir}/${jboss.home.relative.path}/" />
 	<property name="jboss.config" value="default" />
@@ -31,7 +31,7 @@
 	<property name="restcomm-slee.download.distro.name" value="${restcomm-slee.version}.${restcomm-slee.build-number}" />
 	<property name="restcomm-slee.download.distro.file" value="${restcomm-slee.download.distro.name}.zip" />
 	<property name="restcomm-slee.download.url" value="${github.url}/jain-slee/archive/${restcomm-slee.download.distro.file}" />
-	<property name="restcomm-slee.distro.zip.path" value="${checkout.dir}/${restcomm-slee.download.distro.file}" />
+	<property name="restcomm-slee.distro.zip.path" value="${checkout.dir}/jain-slee-${restcomm-slee.download.distro.file}" />
 
  	<property name="restcomm-slee.package.name" value="jain-slee-${restcomm-slee.version}.${restcomm-slee.build-number}" />
 
@@ -42,6 +42,7 @@
 	<property name="restcomm-jss7.download.distro.file" value="jss7-${restcomm-jss7.version}.zip" />
 	<property name="restcomm-jss7.download.url" value="${github.url}/jss7/archive/${restcomm-jss7.version}.zip" />
 	<property name="restcomm-jss7.distro.zip.path" value="${checkout.dir}/${restcomm-jss7.download.distro.file}" />
+ 	<property name="restcomm-jss7.package.name" value="jss7-${restcomm-jss7.version}" />
 
 
 
@@ -49,24 +50,28 @@
 	<property name="jain-slee.http.download.distro.name" value="${jain-slee.http.release}" />
 	<property name="jain-slee.http.download.distro.file" value="${jain-slee.http.download.distro.name}.zip" />
 	<property name="jain-slee.http.download.url" value="${github2.url}/jain-slee.http/zip/${jain-slee.http.download.distro.name}" />
-	<property name="jain-slee.http.distro.zip.path" value="${checkout.dir}" />
 
  	<property name="jain-slee.http.package.name" value="jain-slee.http-${jain-slee.http.release}" />
+
+	<property name="jain-slee.http.distro.zip.path" value="${checkout.dir}/jain-slee.http-${jain-slee.http.download.distro.file}" />
+
 
 
 	<property name="jain-slee.ss7.release" value="2.8.31" />
 	<property name="jain-slee.ss7.download.distro.name" value="${jain-slee.ss7.release}" />
 	<property name="jain-slee.ss7.download.distro.file" value="${jain-slee.ss7.release}.zip" />
 	<property name="jain-slee.ss7.download.url" value="https://github.com/masood-alam/jain-slee.ss7/archive/master.zip" />
-	<property name="jain-slee.ss7.distro.zip.path" value="${checkout.dir}" />
+	<property name="jain-slee.ss7.distro.zip.path" value="${checkout.dir}/jain-slee.ss7-master.zip" />
 
  	<property name="jain-slee.ss7.package.name" value="jain-slee.ss7-master" />
 
 
 
 	<property name="hlr-server.download.url" value="https://github.com/masood-alam/hlr-server/archive/master.zip" />
-
  	<property name="hlr-server.package.name" value="hlr-server-master" />
+
+	<property name="hlr-server.distro.zip.path" value="${checkout.dir}/${hlr-server.package.name}.zip" />
+
 
 
 
@@ -116,34 +121,34 @@
 
 
 
-	<available file="${restcomm-slee.distro.zip.path}" property="got.restcomm-slee" />
-	<target name="get-restcomm-slee" unless="got.restcomm-slee">
+	<available file="${restcomm-slee.distro.zip.path}" property="got.slee" />
+	<target name="get-slee" unless="got.slee">
 		<echo>Downloading RestComm Slee version: ${restcomm-slee.version}</echo>
 		<echo>RestComm Slee Release: ${restcomm-slee.release}</echo>
 		<echo>${restcomm-slee.download.url}</echo>
 		<exec failonerror="true" executable="wget">
 		    <arg value="${restcomm-slee.download.url}" />
-		    <arg value="--output-document=jain-slee-${restcomm-slee.download.distro.file}" />
+		    <arg value="--output-document=${restcomm-slee.distro.zip.path}" />
 		</exec>
-		<move file="./jain-slee-${restcomm-slee.download.distro.file}" todir="${checkout.dir}"/>
+	<!--	<move file="${restcomm-slee.download.distro.file}" todir="${checkout.dir}"/>  -->
 	</target>
 	
-	<target name="unzip-restcomm-slee">
-		<unzip src="${checkout.dir}/jain-slee-${restcomm-slee.download.distro.file}" dest="${checkout.dir}" />
+	<target name="unzip-slee">
+		<unzip src="${restcomm-slee.distro.zip.path}" dest="${checkout.dir}" />
 	</target>
 
-	<target name="build-core" description="">
-		<exec failonerror="true" executable="${mvn.executable}" dir="${ant.file.restcomm.release}/../checkout/${restcomm-slee.package.name}">
+	<target name="build-slee" description="">
+		<exec failonerror="true" executable="${mvn.executable}" dir="${checkout.dir}/${restcomm-slee.package.name}">
 			<arg line="install -Dmaven.test.skip=true -Drelease.dir=${release.dir} -Djboss.home=${jboss.home} -Djboss.path=../../${jboss.home.relative.path}" />
 		</exec>
 	</target>
 
 
-	<target name="build-core-tools" description="">
-		<exec failonerror="true" executable="${mvn.executable}" dir="${ant.file.restcomm.release}/../checkout/${restcomm-slee.package.name}/tools/slee-console-new">
+	<target name="build-slee-tools" description="">
+		<exec failonerror="true" executable="${mvn.executable}" dir="${checkout.dir}/${restcomm-slee.package.name}/tools/slee-console-new">
 			<arg line="install -Dmaven.test.skip=true -Drelease.dir=${release.dir} -Djboss.home=${jboss.home} -Djboss.path=../../${jboss.home.relative.path}" />
 		</exec>
-		<exec failonerror="true" executable="${mvn.executable}" dir="${ant.file.restcomm.release}/../checkout/${restcomm-slee.package.name}/tools/slee-management-console">
+		<exec failonerror="true" executable="${mvn.executable}" dir="${checkout.dir}/${restcomm-slee.package.name}/tools/slee-management-console">
 			<arg line="install -Dmaven.test.skip=true -Drelease.dir=${release.dir} -Djboss.home=${jboss.home} -Djboss.path=../../${jboss.home.relative.path}" />
 		</exec>
 	</target>
@@ -155,108 +160,109 @@ https://repo1.maven.org/maven2/org/jolokia/jolokia-war/1.1.1/jolokia-war-1.1.1.w
 
 
 -->
-	<target name="get-jolokia-war">
+	<available file="${jboss.home}/server/default/deploy/jolokia.war" property="got.jolokia" />
+	<target name="get-jolokia" unless="got.jolokia" >
 		<echo>Downloading jolokia-war: 1.1.1</echo>
 		<exec failonerror="true" executable="wget">
 			<arg value="https://repo1.maven.org/maven2/org/jolokia/jolokia-war/1.1.1/jolokia-war-1.1.1.war" />
-			<arg value="--output-document=jolokia.war" />
+			<arg value="--output-document=${jboss.home}/server/default/deploy/jolokia.war" />
 		</exec>
-		<move file="./jolokia.war" todir="${jboss.home}/server/default/deploy" />
+	<!--	<move file="./jolokia.war" todir="${jboss.home}/server/default/deploy" /> -->
 	</target>
 
 
-	<available file="${restcomm-jss7.download.distro.file}" property="got.restcomm-jss7" />
+	<available file="${restcomm-jss7.distro.zip.path}" property="got.restcomm-jss7" />
 	<target name="get-restcomm-jss7" unless="got.restcomm-jss7">
 		<echo>Is restcomm jss7 : ${restcomm-jss7.distro.zip.path} present ${got.restcomm-jss7}</echo>
 		<echo>Downloading restcomm jss7 version: ${restcomm-jss7.version}</echo>
 		<exec failonerror="true" executable="wget">
 			<arg value="${restcomm-jss7.download.url}" />
-			<arg value="--output-document=${restcomm-jss7.download.distro.file}" />
+			<arg value="--output-document=${restcomm-jss7.distro.zip.path}" />
 		</exec>
-		<move file="./${restcomm-jss7.download.distro.file}" todir="${checkout.dir}" />
+	<!--	<move file="./${restcomm-jss7.download.distro.file}" todir="${checkout.dir}" /> -->
 	</target>
 
 	<target name="unzip-restcomm-jss7" >
-		<delete dir="jss7-${restcomm-jss7.version}" failonerror="false" />
+		<delete dir="${checkout.dir}/jss7-${restcomm-jss7.version}" failonerror="false" />
 		<unzip src="${restcomm-jss7.distro.zip.path}" dest="${checkout.dir}"/>
 	</target>
 
 
 	<target name="build-restcomm-jss7" description="">
-		<exec failonerror="true" executable="${mvn.executable}" dir="${ant.file.restcomm.release}/../checkout/jss7-${restcomm-jss7.version}">
+		<exec failonerror="true" executable="${mvn.executable}" dir="${checkout.dir}/${restcomm-jss7.package.name}">
 			<arg line="install -Dmaven.test.skip=true -Drelease.dir=${release.dir} -Djboss.home=${jboss.home} -Djboss.path=../../${jboss.home.relative.path}" />
 		</exec>
 	</target>
 
 
-	<available file="${ant.file.restcomm.release}/../${jain-slee.http.distro.zip.path}" property="got.jain-slee.http" />
-	<target name="get-http" unless="got.jain-slee.http">
+	<available file="${jain-slee.http.distro.zip.path}" property="got.http" />
+	<target name="get-http" unless="got.http">
 		<echo>Downloading Jain-slee.http</echo>
 	<!--	<get dest="${ant.file.restcomm.release}/../${jain-slee.http.distro.zip.path}" src="${jain-slee.http.download.url}" />  -->
 		<exec failonerror="true" executable="wget">
 		    <arg value="${jain-slee.http.download.url}" />
-		    <arg value="--output-document=jain-slee.http-${jain-slee.http.download.distro.file}" />
+		    <arg value="--output-document=${jain-slee.http.distro.zip.path}" />
 		</exec>
-		<move file="./jain-slee.http-${jain-slee.http.download.distro.file}" todir="${checkout.dir}"/>
+	<!--	<move file="./jain-slee.http-${jain-slee.http.download.distro.file}" todir="${checkout.dir}"/>  -->
 	</target>
 
 	<target name="unzip-http">
-		<delete dir="${checkout.dir}/jain-slee.http-${jain-slee.http.release}" failonerror="false" />
-		<unzip src="${checkout.dir}/jain-slee.http-${jain-slee.http.download.distro.file}" dest="${checkout.dir}" />
+		<delete dir="${checkout.dir}/${jain-slee.http.package.name}" failonerror="false" />
+		<unzip src="${jain-slee.http.distro.zip.path}" dest="${checkout.dir}" />
 	</target>
 
 
 	<target name="build-http" description="">
-		<exec failonerror="true" executable="${mvn.executable}" dir="${ant.file.restcomm.release}/../checkout/${jain-slee.http.package.name}/resources/http-servlet">
+		<exec failonerror="true" executable="${mvn.executable}" dir="${checkout.dir}/${jain-slee.http.package.name}/resources/http-servlet">
 			<arg line="install -Dmaven.test.skip=true -Drelease.dir=${release.dir} -Djboss.home=${jboss.home} -Djboss.path=../../${jboss.home.relative.path}" />
 		</exec>
 	</target>
 
 
-	<available file="${ant.file.restcomm.release}/../${jain-slee.ss7.distro.zip.path}" property="got.jain-slee.ss7" />
-	<target name="get-ss7" unless="got.jain-slee.ss7">
+	<available file="${jain-slee.ss7.distro.zip.path}" property="got.jain-slee.ss7" />
+	<target name="get-slee-ss7" unless="got.jain-slee.ss7">
 		<echo>Downloading Jain-slee.ss7</echo>
 	<!--	<get dest="${ant.file.restcomm.release}/../${jain-slee.http.distro.zip.path}" src="${jain-slee.http.download.url}" />  -->
 		<exec failonerror="true" executable="wget">
 		    <arg value="${jain-slee.ss7.download.url}" />
-		    <arg value="--output-document=jain-slee.ss7-master.zip" />
+		    <arg value="--output-document=${checkout.dir}/jain-slee.ss7-master.zip" />
 		</exec>
-		<move file="./jain-slee.ss7-master.zip" todir="${checkout.dir}"/>
+	<!--	<move file="./jain-slee.ss7-master.zip" todir="${checkout.dir}"/>  -->
 	</target>
 
 
-	<target name="unzip-ss7">
-		<delete dir="${checkout.dir}/jain-slee.ss7-master" failonerror="false" />
-		<unzip src="${checkout.dir}/jain-slee.ss7-master.zip" dest="${checkout.dir}" />
+	<target name="unzip-slee-ss7">
+		<delete dir="${checkout.dir}/${jain-slee.ss7.package.name}" failonerror="false" />
+		<unzip src="${jain-slee.ss7.distro.zip.path}" dest="${checkout.dir}" />
 	</target>
 
-	<target name="build-ss7" description="">
-		<exec failonerror="true" executable="${mvn.executable}" dir="${ant.file.restcomm.release}/../checkout/${jain-slee.ss7.package.name}/resources/map">
+	<target name="build-slee-ss7" description="">
+		<exec failonerror="true" executable="${mvn.executable}" dir="${checkout.dir}/${jain-slee.ss7.package.name}/resources/map">
 			<arg line="install -Dmaven.test.skip=true -Drelease.dir=${release.dir} -Djboss.home=${jboss.home} -Djboss.path=../../${jboss.home.relative.path}" />
 		</exec>
 	</target>
 
 
 
-	<available file="${ant.file.restcomm.release}/../${checkout.dir}" property="got.hlr-server" />
+	<available file="${hlr-server.distro.zip.path}" property="got.hlr-server" />
 	<target name="get-hlr-server" unless="got.hlr-server">
 		<echo>Downloading Hlr-Server</echo>
 	<!--	<get dest="${ant.file.restcomm.release}/../${jain-slee.http.distro.zip.path}" src="${jain-slee.http.download.url}" />  -->
 		<exec failonerror="true" executable="wget">
 		    <arg value="${hlr-server.download.url}" />
-		    <arg value="--output-document=hlr-server.zip" />
+		    <arg value="--output-document=${hlr-server.distro.zip.path}" />
 		</exec>
-		<move file="./hlr-server.zip" todir="${checkout.dir}"/>
+	<!--	<move file="./hlr-server.zip" todir="${checkout.dir}"/> -->
 	</target>
 
 	<target name="unzip-hlr-server">
-		<delete dir="${checkout.dir}/hlr-server-master" failonerror="false" />
-		<unzip src="${checkout.dir}/hlr-server.zip" dest="${checkout.dir}" />
+		<delete dir="${checkout.dir}/${hlr-server.package.name}" failonerror="false" />
+		<unzip src="${hlr-server.distro.zip.path}" dest="${checkout.dir}" />
 	</target>
 
 
 	<target name="build-hlr-server" description="">
-		<exec failonerror="true" executable="${mvn.executable}" dir="${ant.file.restcomm.release}/../checkout/${hlr-server.package.name}/core">
+		<exec failonerror="true" executable="${mvn.executable}" dir="${checkout.dir}/${hlr-server.package.name}/core">
 			<arg line="install -Dmaven.test.skip=true -Drelease.dir=${release.dir} -Djboss.home=${jboss.home} -Djboss.path=../../${jboss.home.relative.path}" />
 		</exec>
 
@@ -273,9 +279,9 @@ https://repo1.maven.org/maven2/org/jolokia/jolokia-war/1.1.1/jolokia-war-1.1.1.w
 
 
 <!--
-depends="clean,get-jboss,unzip-jboss,get-jolokia-war,get-restcomm-slee,unzip-restcomm-slee,build-core,build-core-tools,get-restcomm-jss7,unzip-restcomm-jss7,build-restcomm-jss7,copy-ss7-beans,get-http,unzip-http,build-http,get-ss7,unzip-ss7,build-ss7,get-hlr-server,unzip-hlr-server,build-hlr-server"
+depends="clean,get-jboss,unzip-jboss,get-jolokia,get-restcomm-slee,unzip-restcomm-slee,build-core,build-core-tools,get-restcomm-jss7,unzip-restcomm-jss7,build-restcomm-jss7,copy-ss7-beans,get-http,unzip-http,build-http,get-ss7,unzip-ss7,build-ss7,get-hlr-server,unzip-hlr-server,build-hlr-server"
 -->
-	<target name="release" depends="clean,get-jboss,unzip-jboss,get-jolokia-war,get-restcomm-slee,unzip-restcomm-slee,build-core,build-core-tools,get-restcomm-jss7,unzip-restcomm-jss7,build-restcomm-jss7,copy-ss7-beans,get-http,unzip-http,build-http,get-ss7,unzip-ss7,build-ss7,get-hlr-server,unzip-hlr-server,build-hlr-server" >
+	<target name="release" depends="clean,get-jboss,unzip-jboss,get-jolokia,get-slee,unzip-slee,build-slee,build-slee-tools,get-restcomm-jss7,unzip-restcomm-jss7,build-restcomm-jss7,copy-ss7-beans,get-http,unzip-http,build-http,get-slee-ss7,unzip-slee-ss7,build-slee-ss7,get-hlr-server,unzip-hlr-server,build-hlr-server" >
 
 		<!-- copy log4j presets -->
 		<copy file="${jboss.home}/server/default/deploy/restcomm-slee/log4j-templates/jboss-log4j.xml.default" tofile="${jboss.home}/server/default/conf/jboss-log4j.xml" overwrite="true" />
@@ -301,16 +307,16 @@ depends="clean,get-jboss,unzip-jboss,get-jolokia-war,get-restcomm-slee,unzip-res
 		<delete dir="${checkout.dir}" />
 	</target>
 
-	<available file="${ant.file.restcomm.release}/../${jboss.distro.zip.path}" property="got.jboss" /> 
+	<available file="${checkout.dir}/${jboss.distro.zip}" property="got.jboss" /> 
 	<target name="get-jboss" unless="got.jboss">
 		<echo>Downloading JBoss AS</echo>
 		<echo>${ant.file.restcomm.release}</echo>
-		<get verbose="true" dest="${ant.file.restcomm.release}/../${jboss.distro.zip.path}" src="http://freefr.dl.sourceforge.net/project/jboss/JBoss/JBoss-${jboss.version}/jboss-${jboss.version}-jdk6.zip" />
+		<get verbose="true" dest="${checkout.dir}/${jboss.distro.zip}" src="http://freefr.dl.sourceforge.net/project/jboss/JBoss/JBoss-${jboss.version}/jboss-${jboss.version}-jdk6.zip" />
 	</target>
 
 	<target name="unzip-jboss">
 		<delete dir="${jboss.home}" failonerror="true" />
-		<unzip src="${jboss.distro.zip.path}" dest="${release.dir}" />
+		<unzip src="${checkout.dir}/${jboss.distro.zip}" dest="${release.dir}" />
 		<antcall target="cleanup-jboss" />
 	</target>
 

@@ -60,15 +60,16 @@
 	<property name="jain-slee.ss7.release" value="2.8.31" />
 	<property name="jain-slee.ss7.download.distro.name" value="${jain-slee.ss7.release}" />
 	<property name="jain-slee.ss7.download.distro.file" value="${jain-slee.ss7.release}.zip" />
-	<property name="jain-slee.ss7.download.url" value="https://github.com/masood-alam/jain-slee.ss7/archive/master.zip" />
-	<property name="jain-slee.ss7.distro.zip.path" value="${checkout.dir}/jain-slee.ss7-master.zip" />
+	<property name="jain-slee.ss7.download.url" value="https://github.com/masood-alam/jain-slee.ss7/archive/${jain-slee.ss7.release}.zip" />
+	<property name="jain-slee.ss7.distro.zip.path" value="${checkout.dir}/jain-slee.ss7-${jain-slee.ss7.download.distro.file}" />
 
- 	<property name="jain-slee.ss7.package.name" value="jain-slee.ss7-master" />
+ 	<property name="jain-slee.ss7.package.name" value="jain-slee.ss7-${jain-slee.ss7.release}" />
 
 
 
-	<property name="hlr-server.download.url" value="https://github.com/masood-alam/hlr-server/archive/master.zip" />
- 	<property name="hlr-server.package.name" value="hlr-server-master" />
+	<property name="hlr-server.release" value="1.0" />
+	<property name="hlr-server.download.url" value="https://github.com/masood-alam/hlr-server/archive/${hlr-server.release}.zip" />
+ 	<property name="hlr-server.package.name" value="hlr-server-${hlr-server.release}" />
 
 	<property name="hlr-server.distro.zip.path" value="${checkout.dir}/${hlr-server.package.name}.zip" />
 
@@ -128,9 +129,9 @@
 		<echo>${restcomm-slee.download.url}</echo>
 		<exec failonerror="true" executable="wget">
 		    <arg value="${restcomm-slee.download.url}" />
-		    <arg value="--output-document=${restcomm-slee.distro.zip.path}" />
+		    <arg value="--output-document=jain-slee-${restcomm-slee.download.distro.file}" />
 		</exec>
-	<!--	<move file="${restcomm-slee.download.distro.file}" todir="${checkout.dir}"/>  -->
+		<move file="jain-slee-${restcomm-slee.download.distro.file}" todir="${checkout.dir}"/>  
 	</target>
 	
 	<target name="unzip-slee">
@@ -225,7 +226,7 @@ https://repo1.maven.org/maven2/org/jolokia/jolokia-war/1.1.1/jolokia-war-1.1.1.w
 	<!--	<get dest="${ant.file.restcomm.release}/../${jain-slee.http.distro.zip.path}" src="${jain-slee.http.download.url}" />  -->
 		<exec failonerror="true" executable="wget">
 		    <arg value="${jain-slee.ss7.download.url}" />
-		    <arg value="--output-document=${checkout.dir}/jain-slee.ss7-master.zip" />
+		    <arg value="--output-document=${jain-slee.ss7.distro.zip.path}" />
 		</exec>
 	<!--	<move file="./jain-slee.ss7-master.zip" todir="${checkout.dir}"/>  -->
 	</target>
@@ -281,7 +282,7 @@ https://repo1.maven.org/maven2/org/jolokia/jolokia-war/1.1.1/jolokia-war-1.1.1.w
 <!--
 depends="clean,get-jboss,unzip-jboss,get-jolokia,get-restcomm-slee,unzip-restcomm-slee,build-core,build-core-tools,get-restcomm-jss7,unzip-restcomm-jss7,build-restcomm-jss7,copy-ss7-beans,get-http,unzip-http,build-http,get-ss7,unzip-ss7,build-ss7,get-hlr-server,unzip-hlr-server,build-hlr-server"
 -->
-	<target name="release" depends="clean,get-jboss,unzip-jboss,get-jolokia,get-slee,unzip-slee,build-slee,build-slee-tools,get-restcomm-jss7,unzip-restcomm-jss7,build-restcomm-jss7,copy-ss7-beans,get-http,unzip-http,build-http,get-slee-ss7,unzip-slee-ss7,build-slee-ss7,get-hlr-server,unzip-hlr-server,build-hlr-server" >
+	<target name="release" depends="get-jboss,unzip-jboss,get-jolokia,get-slee,unzip-slee,build-slee,build-slee-tools,get-restcomm-jss7,unzip-restcomm-jss7,build-restcomm-jss7,copy-ss7-beans,get-http,unzip-http,build-http,get-slee-ss7,unzip-slee-ss7,build-slee-ss7,get-hlr-server,unzip-hlr-server,build-hlr-server" >
 
 		<!-- copy log4j presets -->
 		<copy file="${jboss.home}/server/default/deploy/restcomm-slee/log4j-templates/jboss-log4j.xml.default" tofile="${jboss.home}/server/default/conf/jboss-log4j.xml" overwrite="true" />
@@ -299,7 +300,7 @@ depends="clean,get-jboss,unzip-jboss,get-jolokia,get-restcomm-slee,unzip-restcom
 			<param name="jboss.home" value="${jboss.home}" />
 		</antcall>
 		<delete dir="${jboss.home}" failonerror="true" />
-		<antcall target="clean" />
+	<!--	<antcall target="clean" />  -->
 	</target>
 
 	<target name="clean">
@@ -307,16 +308,27 @@ depends="clean,get-jboss,unzip-jboss,get-jolokia,get-restcomm-slee,unzip-restcom
 		<delete dir="${checkout.dir}" />
 	</target>
 
+		<!--
 	<available file="${checkout.dir}/${jboss.distro.zip}" property="got.jboss" /> 
 	<target name="get-jboss" unless="got.jboss">
 		<echo>Downloading JBoss AS</echo>
 		<echo>${ant.file.restcomm.release}</echo>
 		<get verbose="true" dest="${checkout.dir}/${jboss.distro.zip}" src="http://freefr.dl.sourceforge.net/project/jboss/JBoss/JBoss-${jboss.version}/jboss-${jboss.version}-jdk6.zip" />
 	</target>
+		-->
+
+<available file="${ant.file.restcomm.release}/../${jboss.distro.zip}" property="got.jboss" /> 
+	<target name="get-jboss" unless="got.jboss">
+		<echo>Downloading JBoss AS</echo>
+		<echo>${ant.file.restcomm.release}</echo>
+		<get verbose="true" dest="${ant.file.restcomm.release}/../${jboss.distro.zip}" src="http://freefr.dl.sourceforge.net/project/jboss/JBoss/JBoss-${jboss.version}/jboss-${jboss.version}-jdk6.zip" />
+	</target>
+
+
 
 	<target name="unzip-jboss">
 		<delete dir="${jboss.home}" failonerror="true" />
-		<unzip src="${checkout.dir}/${jboss.distro.zip}" dest="${release.dir}" />
+		<unzip src="${ant.file.restcomm.release}/../${jboss.distro.zip}" dest="${release.dir}" />
 		<antcall target="cleanup-jboss" />
 	</target>
 

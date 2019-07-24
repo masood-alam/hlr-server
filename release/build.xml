@@ -42,6 +42,13 @@
 	<property name="dialogic-gctapi.download.distro.file.path" value="JAVA" />
 	<property name="dialogic-gctapi.distro.path" value="${checkout.dir}/${dialogic-gctapi.download.distro.file.path}/gctapi.jar" />
 
+	<property name="jmxtools.version" value="1.2.1" />
+	<property name="jmxtools.download.distro.file" value="jmxtools-${jmxtools.version}.jar" />
+	<property name="jmxtools.download.url" value="http://www.datanucleus.org/downloads/maven2/com/sun/jdmk/jmxtools/1.2.1/jmxtools-1.2.1.jar" />
+	<property name="jmxtools.distro.path" value="${basedir}/${jmxtools.download.distro.file}" />
+
+
+
 	<property name="restcomm-jss7.build-number" value="1383"/>
 	<property name="restcomm-jss7.version" value="7.0.${restcomm-jss7.build-number}"/>
 	<property name="restcomm-jss7.release" value="7.0.1383"/>
@@ -207,6 +214,27 @@ https://repo1.maven.org/maven2/org/jolokia/jolokia-war/1.1.1/jolokia-war-1.1.1.w
 		<unzip src="${restcomm-jss7.distro.zip.path}" dest="${checkout.dir}"/>
 	</target>
 
+
+	 <available file="${jmxtools.distro.path}" property="got.jmxtools" />
+        <target name="get-jmxtools" unless="got.jmxtools">
+                <echo>Is jmxtools : ${jmxtools.distro.path} present </echo>
+                <echo>Downloading jmxtools version: ${jmxtools.version}</echo>
+                <exec failonerror="true" executable="wget">
+                        <arg value="${jmxtools.download.url}" />
+                        <arg value="--output-document=${jmxtools.distro.path}" />
+                </exec>
+        <!--    <move file="./${restcomm-jss7.download.distro.file}" todir="${checkout.dir}" /> -->
+        </target>
+
+	 <target name="install-jmxtools" description="">
+
+        <exec failonerror="true" executable="${mvn.executable}" dir="${basedir}">
+            <arg line="install:install-file -DgroupId=com.sun.jdmk -DartifactId=jmxtools -Dversion=${jmxtools.version} -Dpackaging=jar -Dfile=${jmxtools.distro.path}" />
+                </exec>
+
+        </target>
+
+
  	<target name="install-gctapi" description="">
 
         <exec failonerror="true" executable="${mvn.executable}" dir="${basedir}">
@@ -309,7 +337,7 @@ https://repo1.maven.org/maven2/org/jolokia/jolokia-war/1.1.1/jolokia-war-1.1.1.w
 <!--
 depends="clean,get-jboss,unzip-jboss,get-jolokia,get-restcomm-slee,unzip-restcomm-slee,build-core,build-core-tools,get-restcomm-jss7,unzip-restcomm-jss7,build-restcomm-jss7,copy-ss7-beans,get-http,unzip-http,build-http,get-ss7,unzip-ss7,build-ss7,get-hlr-server,unzip-hlr-server,build-hlr-server"
 -->
-	<target name="release" depends="get-jboss,unzip-jboss,get-jolokia,get-slee,unzip-slee,build-slee,build-slee-tools,get-restcomm-jss7,unzip-restcomm-jss7,install-gctapi,build-restcomm-jss7,copy-ss7-beans,get-http,unzip-http,build-http,get-slee-ss7,unzip-slee-ss7,build-slee-ss7,get-hlr-server,unzip-hlr-server,build-hlr-server" >
+	<target name="release" depends="get-jboss,unzip-jboss,get-jolokia,get-slee,unzip-slee,build-slee,build-slee-tools,get-restcomm-jss7,unzip-restcomm-jss7,install-gctapi,get-jmxtools,install-jmxtools,build-restcomm-jss7,copy-ss7-beans,get-http,unzip-http,build-http,get-slee-ss7,unzip-slee-ss7,build-slee-ss7,get-hlr-server,unzip-hlr-server,build-hlr-server" >
 
 		<!-- copy log4j presets -->
 		<copy file="${jboss.home}/server/default/deploy/restcomm-slee/log4j-templates/jboss-log4j.xml.default" tofile="${jboss.home}/server/default/conf/jboss-log4j.xml" overwrite="true" />

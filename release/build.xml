@@ -35,6 +35,13 @@
 
  	<property name="restcomm-slee.package.name" value="jain-slee-${restcomm-slee.version}.${restcomm-slee.build-number}" />
 
+	<property name="dialogic-gctapi.version" value="6.7.1"/>
+	<property name="dialogic-dpklnx.download.url" value="https://www.dialogic.com/files/DSI/developmentpackages/linux/dpklnx.Z" />
+	<property name="dialogic-dpklnx.distro.zip.path" value="${checkout.dir}/dpklnx.Z" />
+
+	<property name="dialogic-gctapi.download.distro.file.path" value="JAVA" />
+	<property name="dialogic-gctapi.distro.path" value="${checkout.dir}/${dialogic-gctapi.download.distro.file.path}/gctapi.jar" />
+
 	<property name="restcomm-jss7.build-number" value="1383"/>
 	<property name="restcomm-jss7.version" value="7.0.${restcomm-jss7.build-number}"/>
 	<property name="restcomm-jss7.release" value="7.0.1383"/>
@@ -172,6 +179,18 @@ https://repo1.maven.org/maven2/org/jolokia/jolokia-war/1.1.1/jolokia-war-1.1.1.w
 	</target>
 
 
+	<available file="${dialogic-dpklnx.distro.zip.path}" property="got.dpklnx" />
+        <target name="get-dpklnx" unless="got.dpklnx">
+                <echo>Is dialogic dpklnx : ${dialogic-dpklnx.distro.zip.path} </echo>
+                <echo>Downloading restcomm jss7 version: ${restcomm-jss7.version}</echo>
+                <exec failonerror="true" executable="wget">
+                        <arg value="${dialogic-dpklnx.download.url}" />
+                        <arg value="--output-document=${dialogic-dpklnx.distro.zip.path}" />
+                </exec>
+        <!--    <move file="./${restcomm-jss7.download.distro.file}" todir="${checkout.dir}" /> -->
+        </target>
+
+
 	<available file="${restcomm-jss7.distro.zip.path}" property="got.restcomm-jss7" />
 	<target name="get-restcomm-jss7" unless="got.restcomm-jss7">
 		<echo>Is restcomm jss7 : ${restcomm-jss7.distro.zip.path} present ${got.restcomm-jss7}</echo>
@@ -188,8 +207,20 @@ https://repo1.maven.org/maven2/org/jolokia/jolokia-war/1.1.1/jolokia-war-1.1.1.w
 		<unzip src="${restcomm-jss7.distro.zip.path}" dest="${checkout.dir}"/>
 	</target>
 
+ 	<target name="install-gctapi" description="">
+
+        <exec failonerror="true" executable="${mvn.executable}" dir="${basedir}">
+            <arg line="install:install-file -DgroupId=com.vendor.dialogic -DartifactId=gctapi -Dversion=6.7.1 -Dpackaging=jar -Dfile=${basedir}/gctapi-6.7.1.jar" />
+                </exec>
+
+        </target>
 
 	<target name="build-restcomm-jss7" description="">
+
+	<exec failonerror="true" executable="${mvn.executable}" dir="${release.dir}">
+                        <arg line="install:install-file -DgroupId=com.vendor.dialogic -DartifactId=gctapi -Dversion=6.7.1 -Dpackaging=jar -Dfile=${release.dir}/gctapi-6.7.1.jar" />
+                </exec>
+
 		<exec failonerror="true" executable="${mvn.executable}" dir="${checkout.dir}/${restcomm-jss7.package.name}">
 			<arg line="install -Dmaven.test.skip=true -Drelease.dir=${release.dir} -Djboss.home=${jboss.home} -Djboss.path=../../${jboss.home.relative.path}" />
 		</exec>

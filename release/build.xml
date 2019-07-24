@@ -217,10 +217,6 @@ https://repo1.maven.org/maven2/org/jolokia/jolokia-war/1.1.1/jolokia-war-1.1.1.w
 
 	<target name="build-restcomm-jss7" description="">
 
-	<exec failonerror="true" executable="${mvn.executable}" dir="${release.dir}">
-                        <arg line="install:install-file -DgroupId=com.vendor.dialogic -DartifactId=gctapi -Dversion=6.7.1 -Dpackaging=jar -Dfile=${release.dir}/gctapi-6.7.1.jar" />
-                </exec>
-
 		<exec failonerror="true" executable="${mvn.executable}" dir="${checkout.dir}/${restcomm-jss7.package.name}">
 			<arg line="install -Dmaven.test.skip=true -Drelease.dir=${release.dir} -Djboss.home=${jboss.home} -Djboss.path=../../${jboss.home.relative.path}" />
 		</exec>
@@ -313,7 +309,7 @@ https://repo1.maven.org/maven2/org/jolokia/jolokia-war/1.1.1/jolokia-war-1.1.1.w
 <!--
 depends="clean,get-jboss,unzip-jboss,get-jolokia,get-restcomm-slee,unzip-restcomm-slee,build-core,build-core-tools,get-restcomm-jss7,unzip-restcomm-jss7,build-restcomm-jss7,copy-ss7-beans,get-http,unzip-http,build-http,get-ss7,unzip-ss7,build-ss7,get-hlr-server,unzip-hlr-server,build-hlr-server"
 -->
-	<target name="release" depends="get-jboss,unzip-jboss,get-jolokia,get-slee,unzip-slee,build-slee,build-slee-tools,get-restcomm-jss7,unzip-restcomm-jss7,build-restcomm-jss7,copy-ss7-beans,get-http,unzip-http,build-http,get-slee-ss7,unzip-slee-ss7,build-slee-ss7,get-hlr-server,unzip-hlr-server,build-hlr-server" >
+	<target name="release" depends="get-jboss,unzip-jboss,get-jolokia,get-slee,unzip-slee,build-slee,build-slee-tools,get-restcomm-jss7,unzip-restcomm-jss7,install-gctapi,build-restcomm-jss7,copy-ss7-beans,get-http,unzip-http,build-http,get-slee-ss7,unzip-slee-ss7,build-slee-ss7,get-hlr-server,unzip-hlr-server,build-hlr-server" >
 
 		<!-- copy log4j presets -->
 		<copy file="${jboss.home}/server/default/deploy/restcomm-slee/log4j-templates/jboss-log4j.xml.default" tofile="${jboss.home}/server/default/conf/jboss-log4j.xml" overwrite="true" />
